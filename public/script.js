@@ -129,9 +129,74 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateChart(dates, predictions, actual, anomalies) {
-        console.log("Updating chart...", dates, predictions, actual, anomalies);
-        // Chart.js implementation goes here
+        const ctx = document.getElementById("sales-chart").getContext("2d");
+    
+        if (chartInstance) {
+            chartInstance.destroy(); // Destroy previous chart before creating a new one
+        }
+    
+        // Find anomaly indexes for highlighting
+        const anomalyIndexes = anomalies.map(date => dates.indexOf(date)).filter(index => index !== -1);
+    
+        chartInstance = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: dates,
+                datasets: [
+                    {
+                        label: "Predicted Sales",
+                        data: predictions,
+                        borderColor: "#4CAF50",
+                        backgroundColor: "rgba(76, 175, 80, 0.2)",
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: "#4CAF50",
+                        tension: 0.3,
+                    },
+                    {
+                        label: "Actual Sales",
+                        data: actual,
+                        borderColor: "#2196F3",
+                        backgroundColor: "rgba(33, 150, 243, 0.2)",
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: "#2196F3",
+                        tension: 0.3,
+                    },
+                    {
+                        label: "Anomalies",
+                        data: dates.map((_, i) => (anomalyIndexes.includes(i) ? actual[i] : null)), 
+                        borderColor: "#FF5722",
+                        backgroundColor: "#FF5722",
+                        borderWidth: 0,
+                        pointRadius: 5,
+                        pointBackgroundColor: "#FF5722",
+                        pointStyle: "rectRot",
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "top" },
+                    tooltip: { mode: "index", intersect: false },
+                },
+                scales: {
+                    x: { 
+                        display: true,
+                        title: { display: true, text: "Date" },
+                    },
+                    y: { 
+                        display: true,
+                        title: { display: true, text: "Sales" },
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
     }
+    
 
     productSelect.addEventListener("change", () => {
         if (productSelect.value) {
