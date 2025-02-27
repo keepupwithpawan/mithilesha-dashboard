@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mithilesha Analytics Dashboard</title>
+    <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="home.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">M</div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="#">About</a>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </nav>
+    </header>
+
+    <section class="hero-section">
+        <h1 class="hero-title">A LSTM Model to help you predict sales</h1>
+        <p class="hero-description">Leverage the power of machine learning to forecast your sales with unprecedented accuracy. Our advanced LSTM model analyzes patterns and delivers actionable insights.</p>
+        <button class="cta-button">Go to Dashboard</button>
+    </section>
+    
+    <section class="video-section">
+        <div class="video-container">
+            <video src="assets/simple-apple-macbook-air-m2-13.mp4" autoplay loop muted></video>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="features-container">
+            <h2 class="features-title">Why Choose Our Platform</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Accurate Predictions</h3>
+                    <p class="feature-description">Our LSTM model delivers highly accurate sales forecasts to help you make informed decisions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Intuitive Dashboard</h3>
+                    <p class="feature-description">Access your data and insights through our clean, user-friendly dashboard interface.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Real-time Updates</h3>
+                    <p class="feature-description">Get the latest predictions with real-time data processing and continuous model training.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h2>M</h2>
+                <p>Mithilesha Analytics</p>
+            </div>
+            <p class="copyright">© 2025 Mithilesha Analytics. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+    // Get the current page filename
+    const currentPage = window.location.pathname.split('/').pop();
+
+    // Get all navigation links
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    // Add active class based on current page
+    navLinks.forEach(link => {
+        const linkHref = link.getAttribute('href');
+        
+        // Check if the link points to the current page or if it's home and we're on index
+        if ((linkHref === currentPage) || 
+            (linkHref === '#' && link.textContent === 'Home' && (currentPage === '' || currentPage === 'index.html')) ||
+            (linkHref === '#' && link.textContent === 'Dashboard' && currentPage === 'dashboard.html')) {
+            
+            link.classList.add('active-link');
+        }
+    });
+
+        // CTA button functionality
+        document.querySelector('.cta-button').addEventListener('click', function() {
+            // Add navigation functionality here
+            location.href = 'dashboard.html';
+        });
+
+        // Dark mode toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // Check for saved theme preference
+        if (localStorage.getItem('dark-mode') === 'true') {
+            document.body.classList.add('dark-mode');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+        
+        // Toggle dark mode
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            
+            // Toggle icon between moon and sun
+            if (document.body.classList.contains('dark-mode')) {
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('dark-mode', 'true');
+            } else {
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('dark-mode', 'false');
+            }
+        });
+    </script>
+</body>
+</html>
