@@ -1,0 +1,307 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'General Sans', sans-serif;
+}
+
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #0f172a;
+  --accent-color: #3b82f6;
+  --text-primary: #333;
+  --text-secondary: #64748b;
+  --background-light: #ffffff;
+  --card-background: #ffffff;
+  --header-bg: #000;
+  --header-text: white;
+  --footer-bg: black;
+  --footer-text: white;
+  --border-color: #e2e8f0;
+  --message-user-bg: #2563eb;
+  --message-bot-bg: #ffffff;
+}
+
+/* Add dark mode variables */
+body.dark-mode {
+  --primary-color: #3b82f6;
+  --secondary-color: #e2e8f0;
+  --accent-color: #60a5fa;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a1a1aa;
+  --background-light: #1a1a1a;
+  --card-background: #2a2a2a;
+  --header-bg: #1e1e1e;
+  --header-text: #e0e0e0;
+  --footer-bg: #1e1e1e;
+  --footer-text: #e0e0e0;
+  --border-color: #4a4a4a;
+  --message-user-bg: #3b82f6;
+  --message-bot-bg: #2a2a2a;
+}
+
+body {
+  background-color: var(--background-light);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add transitions */
+body, .header, .chat-container, .footer, .input-container, .message {
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Theme toggle styles */
+.theme-toggle {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--header-text);
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+.theme-toggle:hover {
+  background: none;
+  transform: rotate(15deg);
+}
+
+/* Header Styles */
+.header {
+  background-color: var(--header-bg);
+  color: var(--header-text);
+  max-width: 1200px;
+  width: 90%;
+  margin: 20px auto 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.logo p {
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: var(--header-text);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+  font-size: 15px;
+}
+
+.nav-links a:hover {
+  opacity: 0.8;
+}
+
+.nav-links .active-link {
+  position: relative;
+  font-weight: 600;
+}
+
+.nav-links .active-link::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--header-text, white);
+  opacity: 0.8;
+}
+
+.chat-container {
+  width: 85%;
+  height: 70vh;
+  background-color: var(--card-background);
+  color: var(--text-primary);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  margin: 2rem auto;
+  overflow: hidden;
+}
+
+.profile-image {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.message {
+  margin-bottom: 15px;
+  width: max-content;
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+}
+
+.user-message {
+  background-color: var(--message-user-bg);
+  color: white;
+  margin-left: auto;
+  border: none;
+}
+
+.bot-message {
+  background-color: var(--message-bot-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.chat-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.input-container {
+  background-color: var(--card-background);
+  padding: 16px 24px;
+  display: flex;
+  gap: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+input {
+  background-color: var(--background-light);
+  flex-grow: 1;
+  padding: 12px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+button {
+  padding: 12px 20px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  font-weight: 500;
+}
+
+button:hover {
+  background-color: var(--primary-color);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.loading {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 16px 24px;
+  padding: 8px 12px;
+  background-color: var(--background-light);
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+}
+
+.loading::after {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--text-secondary);
+  animation: loading-dots 1.5s infinite;
+  margin-left: 5px;
+  position: relative;
+}
+
+/* Footer (add if needed) */
+.footer {
+  background-color: var(--footer-bg);
+  color: var(--footer-text);
+  padding: 3rem 0;
+  margin-top: 50px;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+@keyframes loading-dots {
+  0%, 100% {
+    box-shadow: 0 0 var(--text-secondary), 8px 0 var(--text-secondary), 16px 0 var(--text-secondary);
+  }
+  25% {
+    box-shadow: 0 0 var(--text-secondary), 8px 0 var(--text-secondary), 16px 0 rgba(0, 0, 0, 0);
+  }
+  50% {
+    box-shadow: 0 0 var(--text-secondary), 8px 0 rgba(0, 0, 0, 0), 16px 0 rgba(0, 0, 0, 0);
+  }
+  75% {
+    box-shadow: 0 0 rgba(0, 0, 0, 0), 8px 0 var(--text-secondary), 16px 0 var(--text-secondary);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chat-container {
+    width: 95%;
+    height: 75vh;
+  }
+  
+  .message {
+    max-width: 85%;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+    padding-top: 0.5rem;
+  }
+}

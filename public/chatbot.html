@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mithilesha Analytics - Chat</title>
+    <link
+      rel="shortcut icon"
+      href="https://cdn.cosmos.so/597fcf16-bfa9-4b76-bad3-8a0726e4abd5?format=jpeg"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="chatbot.css" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@400,600,700&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/4b1022cf8e.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">
+        <p>M</p>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="about.html">About</a>
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          aria-label="Toggle dark mode"
+        >
+          <i class="fas fa-moon"></i>
+        </button>
+      </nav>
+    </div>
+
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <!-- Initial Bot message -->
+        <div class="message bot-message">
+          <img
+            src="./assets/M.png"
+            alt=""
+            class="profile-image"
+          />
+          <div>
+            Hey, you can ask for more insights below. For example: <br />
+            1. What is the most sold product?<br />
+            2. Which products are included in the dataset?
+          </div>
+        </div>
+      </div>
+      <div class="loading" id="loading" style="display: none">
+        Vetra is thinking
+      </div>
+
+      <div class="input-container">
+        <input type="text" id="userInput" placeholder="Type your message..." />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <h2>M</h2>
+          <p>Mithilesha Analytics</p>
+        </div>
+        <p class="copyright">
+          © 2025 Mithilesha Analytics. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      const chatMessages = document.getElementById("chatMessages");
+      const userInput = document.getElementById("userInput");
+      const loading = document.getElementById("loading");
+
+      userInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendMessage();
+      });
+
+      // Get the current page filename
+      const currentPage = window.location.pathname.split("/").pop();
+
+      // Get all navigation links
+      const navLinks = document.querySelectorAll(".nav-links a");
+
+      // Add active class based on current page
+      navLinks.forEach((link) => {
+        const linkHref = link.getAttribute("href");
+
+        // Check if the link points to the current page or if it's home and we're on index
+        if (
+          linkHref === currentPage ||
+          (linkHref === "#" &&
+            link.textContent === "Home" &&
+            (currentPage === "" || currentPage === "index.html")) ||
+          (linkHref === "#" &&
+            link.textContent === "Dashboard" &&
+            currentPage === "dashboard.html")
+        ) {
+          link.classList.add("active-link");
+        }
+      });
+
+      // Dark mode toggle functionality
+      const themeToggle = document.getElementById("theme-toggle");
+      const themeIcon = themeToggle.querySelector("i");
+
+      // Check for saved theme preference
+      if (localStorage.getItem("dark-mode") === "true") {
+        document.body.classList.add("dark-mode");
+        themeIcon.classList.replace("fa-moon", "fa-sun");
+      }
+
+      // Toggle dark mode
+      themeToggle.addEventListener("click", function () {
+        document.body.classList.toggle("dark-mode");
+
+        // Toggle icon between moon and sun
+        if (document.body.classList.contains("dark-mode")) {
+          themeIcon.classList.replace("fa-moon", "fa-sun");
+          localStorage.setItem("dark-mode", "true");
+        } else {
+          themeIcon.classList.replace("fa-sun", "fa-moon");
+          localStorage.setItem("dark-mode", "false");
+        }
+      });
+
+      // Add active class based on current page
+      navLinks.forEach((link) => {
+        const linkHref = link.getAttribute("href");
+
+        if (
+          linkHref === currentPage ||
+          (linkHref === "chatbot.html" && currentPage === "") ||
+          (linkHref === "chatbot.html" && currentPage === "chatbot.html")
+        ) {
+          link.classList.add("active-link");
+        }
+      });
+
+      async function sendMessage() {
+        const message = userInput.value.trim();
+        if (!message) return;
+
+        // Create user message element
+        const userMessageDiv = document.createElement("div");
+        userMessageDiv.classList.add("message", "user-message");
+        userMessageDiv.textContent = message;
+        chatMessages.appendChild(userMessageDiv);
+
+        userInput.value = "";
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Show the loading indicator
+        loading.style.display = "block";
+
+        try {
+          const response = await fetch(
+            "https://mithilesha-langflow-render.onrender.com",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                input_value: message,
+                input_type: "chat",
+                output_type: "chat",
+                context: {
+                  dataset: [
+                    {
+                      post_type: "carousel",
+                      likes: 120,
+                      shares: 30,
+                      comments: 15,
+                      impressions: 1000,
+                      reach: 800,
+                    },
+                    {
+                      post_type: "reel",
+                      likes: 200,
+                      shares: 40,
+                      comments: 25,
+                      impressions: 1500,
+                      reach: 1200,
+                    },
+                  ],
+                },
+              }),
+            }
+          );
+
+          const data = await response.json();
+          console.log("API Response:", data);
+
+          const botResponse =
+            data.outputs?.[0]?.outputs?.[0]?.artifacts?.message ??
+            "Sorry, I couldn't process that response.";
+
+          // Create bot message with profile image
+          const botMessageDiv = document.createElement("div");
+          botMessageDiv.classList.add("message", "bot-message");
+
+          const profileImg = document.createElement("img");
+          profileImg.src =
+            "./assets/M.png";
+          profileImg.alt = "bot profile";
+          profileImg.classList.add("profile-image");
+
+          const messageTextDiv = document.createElement("div");
+          messageTextDiv.textContent = botResponse;
+
+          botMessageDiv.appendChild(profileImg);
+          botMessageDiv.appendChild(messageTextDiv);
+
+          chatMessages.appendChild(botMessageDiv);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        } catch (error) {
+          console.error("Error:", error);
+
+          // Create error message
+          const errorMessageDiv = document.createElement("div");
+          errorMessageDiv.classList.add("message", "bot-message");
+
+          const profileImg = document.createElement("img");
+          profileImg.src =
+            "./assets/M.png";
+          profileImg.alt = "bot profile";
+          profileImg.classList.add("profile-image");
+
+          const messageTextDiv = document.createElement("div");
+          messageTextDiv.textContent =
+            "Sorry, I encountered an error. Please try again.";
+
+          errorMessageDiv.appendChild(profileImg);
+          errorMessageDiv.appendChild(messageTextDiv);
+
+          chatMessages.appendChild(errorMessageDiv);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        } finally {
+          // Hide the loading indicator
+          loading.style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>
