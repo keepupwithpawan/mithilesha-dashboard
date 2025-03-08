@@ -120,6 +120,34 @@ body, .header, .card, .footer, .select-control {
     opacity: 0.8;
 }
 
+/* Floating Chatbot Button */
+.chatbot {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: var(--header-bg);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.chatbot:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.chatbot > img {
+    width: 40px;
+}
+
 /* Bento Grid Container */
 .container {
     max-width: 1200px;
