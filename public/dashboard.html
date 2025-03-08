@@ -1,106 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mithilesha Analytics - Dashboard</title>
-    <link rel="shortcut icon" href="./assets/M.png" type="image/x-icon">
-    <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,600,700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="./assets/M.png" type="image/x-icon" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@400,600,700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
     <div class="header">
-        <div class="logo">
-            <p>M</p>
-        </div>
-        <nav class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="about.html">About</a>
-            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-                <i class="fas fa-moon"></i>
-            </button>
-        </nav>
+      <div class="logo">
+        <p>M</p>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="about.html">About</a>
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          aria-label="Toggle dark mode"
+        >
+          <i class="fas fa-moon"></i>
+        </button>
+      </nav>
     </div>
-    
+
+    <div class="chatbot" aria-label="Chat with our AI assistant">
+      <i class="fas fa-robot"></i>
+    </div>
+
     <div class="container bento-grid">
-        <!-- Large Sales Chart Card -->
-        <div class="card chart-card">
-            <div class="card-header">
-                <h2 class="card-title">Sales Performance</h2>
-                <div class="card-description">
-                    <p>Compare actual sales data against AI-driven predictions over time</p>
-                </div>
-            </div>
-            <div class="chart-container">
-                <canvas id="sales-chart" class="chart-canvas"></canvas>
-            </div>
+      <!-- Large Sales Chart Card -->
+      <div class="card chart-card">
+        <div class="card-header">
+          <h2 class="card-title">Sales Performance</h2>
+          <div class="card-description">
+            <p>
+              Compare actual sales data against AI-driven predictions over time
+            </p>
+          </div>
         </div>
-        
-        <!-- Medium Sales Prediction Card -->
-        <div class="card prediction-card">
-            <div class="card-header">
-                <h2 class="card-title">Predicted Sales</h2>
-                <div class="card-description">
-                    <p>AI-powered forecast based on historical patterns</p>
-                </div>
-            </div>
-            <div class="prediction-content">
-                <div class="icon-container">
-                    <span class="prediction-icon">📈</span>
-                </div>
-                <p id="sales-number" class="sales-info">Loading sales data...</p>
-            </div>
+        <div class="chart-container">
+          <canvas id="sales-chart" class="chart-canvas"></canvas>
         </div>
-        
-        <!-- Medium Anomaly Detection Card -->
-        <div class="card anomaly-card">
-            <div class="card-header">
-                <h2 class="card-title">Anomaly Detection</h2>
-                <div class="card-description">
-                    <p>Unusual sales patterns that may require attention</p>
-                </div>
-            </div>
-            <div id="anomaly-box" class="anomaly-content">
-                <div class="loading-indicator">Loading anomaly data...</div>
-            </div>
+      </div>
+
+      <!-- Medium Sales Prediction Card -->
+      <div class="card prediction-card">
+        <div class="card-header">
+          <h2 class="card-title">Predicted Sales</h2>
+          <div class="card-description">
+            <p>AI-powered forecast based on historical patterns</p>
+          </div>
         </div>
-        
-        <!-- Medium Dashboard Controls Card -->
-        <div class="card controls-card">
-            <div class="card-header">
-                <h2 class="card-title">Dashboard Controls</h2>
-                <div class="card-description">
-                    <p>Customize your view of the analytics data</p>
-                </div>
-            </div>
-            
-            <div class="controls-content">
-                <div class="control-group">
-                    <label for="product-select">Product Line</label>
-                    <select id="product-select" class="select-control">
-                        <option value="" disabled selected>Loading products...</option>
-                    </select>
-                    <span class="hint-text">Select which product line to analyze</span>
-                </div>
-                
-                <div class="control-group">
-                    <label for="timeframe-select">Time Period</label>
-                    <select id="timeframe-select" class="select-control">
-                        <option value="1M">Last Month</option>
-                        <option value="3M" selected>Last 3 Months</option>
-                        <option value="6M">Last 6 Months</option>
-                        <option value="1Y">Last Year</option>
-                        <option value="ALL">All Data</option>
-                    </select>
-                    <span class="hint-text">Choose the historical time range to display</span>
-                </div>
-            </div>
+        <div class="prediction-content">
+          <div class="icon-container">
+            <span class="prediction-icon">📈</span>
+          </div>
+          <p id="sales-number" class="sales-info">Loading sales data...</p>
         </div>
+      </div>
+
+      <!-- Medium Anomaly Detection Card -->
+      <div class="card anomaly-card">
+        <div class="card-header">
+          <h2 class="card-title">Anomaly Detection</h2>
+          <div class="card-description">
+            <p>Unusual sales patterns that may require attention</p>
+          </div>
+        </div>
+        <div id="anomaly-box" class="anomaly-content">
+          <div class="loading-indicator">Loading anomaly data...</div>
+        </div>
+      </div>
+
+      <!-- Medium Dashboard Controls Card -->
+      <div class="card controls-card">
+        <div class="card-header">
+          <h2 class="card-title">Dashboard Controls</h2>
+          <div class="card-description">
+            <p>Customize your view of the analytics data</p>
+          </div>
+        </div>
+
+        <div class="controls-content">
+          <div class="control-group">
+            <label for="product-select">Product Line</label>
+            <select id="product-select" class="select-control">
+              <option value="" disabled selected>Loading products...</option>
+            </select>
+            <span class="hint-text">Select which product line to analyze</span>
+          </div>
+
+          <div class="control-group">
+            <label for="timeframe-select">Time Period</label>
+            <select id="timeframe-select" class="select-control">
+              <option value="1M">Last Month</option>
+              <option value="3M" selected>Last 3 Months</option>
+              <option value="6M">Last 6 Months</option>
+              <option value="1Y">Last Year</option>
+              <option value="ALL">All Data</option>
+            </select>
+            <span class="hint-text"
+              >Choose the historical time range to display</span
+            >
+          </div>
+        </div>
+      </div>
     </div>
-    
+
     <!-- <div class="insights-banner">
         <div class="insights-content">
             <h3>Need deeper insights?</h3>
@@ -110,59 +128,96 @@
     </div> -->
 
     <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <h2>M</h2>
-                <p>Mithilesha Analytics</p>
-            </div>
-            <p class="copyright">© 2025 Mithilesha Analytics. All rights reserved.</p>
+      <div class="footer-content">
+        <div class="footer-logo">
+          <h2>M</h2>
+          <p>Mithilesha Analytics</p>
         </div>
+        <p class="copyright">
+          © 2025 Mithilesha Analytics. All rights reserved.
+        </p>
+      </div>
     </footer>
-    
+
     <script>
-    // Get the current page filename
-    const currentPage = window.location.pathname.split('/').pop();
+      const chatbot = document.querySelector(".chatbot");
 
-    // Get all navigation links
-    const navLinks = document.querySelectorAll('.nav-links a');
+      chatbot.addEventListener("click", () => {
+        location.href = "chatbot.html";
+      });
 
-    // Add active class based on current page
-    navLinks.forEach(link => {
-        const linkHref = link.getAttribute('href');
-        
+      // Get the current page filename
+      const currentPage = window.location.pathname.split("/").pop();
+
+      // Get all navigation links
+      const navLinks = document.querySelectorAll(".nav-links a");
+
+      // Add active class based on current page
+      navLinks.forEach((link) => {
+        const linkHref = link.getAttribute("href");
+
         // Check if the link points to the current page or if it's home and we're on index
-        if ((linkHref === currentPage) || 
-            (linkHref === '#' && link.textContent === 'Home' && (currentPage === '' || currentPage === 'index.html')) ||
-            (linkHref === '#' && link.textContent === 'Dashboard' && currentPage === 'dashboard.html')) {
-            
-            link.classList.add('active-link');
+        if (
+          linkHref === currentPage ||
+          (linkHref === "#" &&
+            link.textContent === "Home" &&
+            (currentPage === "" || currentPage === "index.html")) ||
+          (linkHref === "#" &&
+            link.textContent === "Dashboard" &&
+            currentPage === "dashboard.html")
+        ) {
+          link.classList.add("active-link");
         }
-    });
+      });
 
-        // Dark mode toggle functionality
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
-        
-        // Check for saved theme preference
-        if (localStorage.getItem('dark-mode') === 'true') {
-            document.body.classList.add('dark-mode');
-            themeIcon.classList.replace('fa-moon', 'fa-sun');
+      // Dark mode toggle functionality
+      const themeToggle = document.getElementById("theme-toggle");
+      const themeIcon = themeToggle.querySelector("i");
+
+      // Check for saved theme preference
+      if (localStorage.getItem("dark-mode") === "true") {
+        document.body.classList.add("dark-mode");
+        themeIcon.classList.replace("fa-moon", "fa-sun");
+      }
+
+      // Toggle dark mode
+      themeToggle.addEventListener("click", function () {
+        document.body.classList.toggle("dark-mode");
+
+        // Toggle icon between moon and sun
+        if (document.body.classList.contains("dark-mode")) {
+          themeIcon.classList.replace("fa-moon", "fa-sun");
+          localStorage.setItem("dark-mode", "true");
+        } else {
+          themeIcon.classList.replace("fa-sun", "fa-moon");
+          localStorage.setItem("dark-mode", "false");
         }
-        
-        // Toggle dark mode
-        themeToggle.addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-            
-            // Toggle icon between moon and sun
-            if (document.body.classList.contains('dark-mode')) {
-                themeIcon.classList.replace('fa-moon', 'fa-sun');
-                localStorage.setItem('dark-mode', 'true');
-            } else {
-                themeIcon.classList.replace('fa-sun', 'fa-moon');
-                localStorage.setItem('dark-mode', 'false');
-            }
-        });
+      });
+
+      // Function to handle the chatbot button position
+      function handleChatbotPosition() {
+        const footer = document.querySelector(".footer");
+        const footerTop = footer.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+
+        // Calculate if the footer is visible in the viewport
+        if (footerTop < windowHeight - 100) {
+          // Position the chatbot above the footer
+          const distanceFromBottom = windowHeight - footerTop + 20;
+          chatbot.style.bottom = distanceFromBottom + "px";
+        } else {
+          // Reset to fixed position
+          chatbot.style.bottom = "30px";
+        }
+      }
+
+      // Add scroll event listener
+      window.addEventListener("scroll", handleChatbotPosition);
+      window.addEventListener("resize", handleChatbotPosition);
+
+      // Run once on page load
+      document.addEventListener("DOMContentLoaded", handleChatbotPosition);
     </script>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
