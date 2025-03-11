@@ -54,7 +54,7 @@ for product in PRODUCT_COLUMNS:
     scaler = MinMaxScaler()
     scaled_data = scaler.fit_transform(df[[product]])
 
-    # Create sequences
+    # Create sequences for the entire dataset
     X, y = create_sequences(scaled_data, SEQ_LENGTH)
     train_size = int(len(X) * TRAIN_RATIO)
 
@@ -65,27 +65,29 @@ for product in PRODUCT_COLUMNS:
     model = build_lstm_model((SEQ_LENGTH, 1))
     model.fit(X_train, y_train, epochs=50, batch_size=16, verbose=1)
 
-    # Make predictions
-    y_pred = model.predict(X_test)
+    # Predict for the ENTIRE dataset
+    full_X = create_sequences(scaled_data, SEQ_LENGTH)[0]  # All sequences
+    y_pred_full = model.predict(full_X)
 
-    # Inverse transform predictions
-    y_test_inv = scaler.inverse_transform(y_test)
-    y_pred_inv = scaler.inverse_transform(y_pred)
+    # Inverse transform predictions and actuals
+    y_full = scaled_data[SEQ_LENGTH:]  # Actual values aligned with predictions
+    y_pred_full_inv = scaler.inverse_transform(y_pred_full)
+    y_full_inv = scaler.inverse_transform(y_full)
 
-    # Convert data to lists
-    y_test_list = y_test_inv.flatten().tolist()
-    y_pred_list = [round(num, 2) for num in y_pred_inv.flatten().tolist()]
-    dates = df.index[-len(y_test):].strftime("%Y-%m-%d").tolist()
+    # Convert to lists
+    dates = df.index[SEQ_LENGTH:].strftime("%Y-%m-%d").tolist()
+    actual_sales = y_full_inv.flatten().tolist()
+    predicted_sales = [round(num, 2) for num in y_pred_full_inv.flatten().tolist()]
 
-    # Anomaly detection (spikes or drops)
-    threshold = 1.5 * np.std(np.array(y_test_list) - np.array(y_pred_list))
-    anomalies = [dates[i] for i in range(len(y_test_list)) if abs(y_test_list[i] - y_pred_list[i]) > threshold]
+    # Anomaly detection
+    threshold = 1.5 * np.std(np.array(actual_sales) - np.array(predicted_sales))
+    anomalies = [dates[i] for i in range(len(actual_sales)) if abs(actual_sales[i] - predicted_sales[i]) > threshold]
 
     # Store results
     results[product] = {
         "dates": dates,
-        "actual_sales": y_test_list,
-        "predicted_sales": y_pred_list,
+        "actual_sales": actual_sales,
+        "predicted_sales": predicted_sales,
         "anomalies": anomalies
     }
 
