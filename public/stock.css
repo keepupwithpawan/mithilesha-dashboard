@@ -1,0 +1,353 @@
+/* Base styles inherited from main CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'General Sans', sans-serif;
+}
+
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #0f172a;
+    --accent-color: #3b82f6;
+    --text-primary: #333;
+    --text-secondary: #64748b;
+    --background-light: #fafafa;
+    --card-background: #ffffff;
+    --header-bg: #000;
+    --header-text: white;
+    --footer-bg: black;
+    --footer-text: white;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+}
+
+/* Dark mode variables */
+body.dark-mode {
+    --primary-color: #3b82f6;
+    --secondary-color: #e2e8f0;
+    --accent-color: #60a5fa;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a1a1aa;
+    --background-light: #1a1a1a;
+    --card-background: #2a2a2a;
+    --header-bg: #1e1e1e;
+    --header-text: #e0e0e0;
+    --footer-bg: #1e1e1e;
+    --footer-text: #e0e0e0;
+    --border-color: #4a4a4a;
+}
+
+body {
+    background-color: var(--background-light);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Add transitions */
+body, .header, .card, .footer, .select-control {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+/* Theme toggle styles */
+.theme-toggle {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--header-text);
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+}
+
+.theme-toggle:hover {
+    transform: rotate(15deg);
+}
+
+/* Header Styles */
+.header {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    max-width: 1200px;
+    width: 90%;
+    margin: 20px auto 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+}
+
+.nav-links a {
+    color: var(--header-text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+    font-size: 15px;
+}
+
+.nav-links a:hover {
+    opacity: 0.8;
+}
+
+.nav-links .active-link {
+    position: relative;
+    font-weight: 600;
+}
+
+.nav-links .active-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--header-text, white);
+    opacity: 0.8;
+}
+
+/* Floating Chatbot Button */
+.chatbot {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: var(--header-bg);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.chatbot:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.chatbot i {
+    font-size: 24px;
+}
+
+/* Bento Grid Container */
+.container {
+    width: 90%;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto auto;
+    grid-gap: 24px;
+}
+
+/* Card Styles */
+.card {
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    margin-bottom: 1rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.card-description p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Different Card Sizes */
+.controls-card {
+    grid-column: span 12;
+    grid-row: span 1;
+}
+
+.prediction-card {
+    grid-column: span 4;
+    grid-row: span 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
+}
+
+/* Stock Status Specific Styles */
+.stock-number {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-top: 1rem;
+}
+
+.stock-status {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.low-stock {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.high-stock {
+    background-color: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+/* Stock Overview Styles */
+.stock-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stock-item:last-child {
+    border-bottom: none;
+}
+
+.stock-product {
+    font-weight: 500;
+}
+
+.stock-value {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.loading-indicator {
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+    padding: 2rem 0;
+}
+
+/* Footer Styling */
+.footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    padding: 3rem 0;
+    margin-top: auto;
+    border-radius: 20px 20px 0 0;
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: center;
+}
+
+.footer-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-logo h2 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.copyright {
+    font-size: 0.875rem;
+    opacity: 0.7;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .prediction-card {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 992px) {
+    .bento-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    
+    .controls-card {
+        grid-column: span 6;
+    }
+    
+    .prediction-card {
+        grid-column: span 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .controls-card, .prediction-card {
+        grid-column: span 1;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .nav-links {
+        width: 100%;
+        justify-content: center;
+        padding-top: 0.5rem;
+    }
+}

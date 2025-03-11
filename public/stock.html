@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mithilesha Analytics - Stock Status</title>
+    <link rel="shortcut icon" href="./assets/M.png" type="image/x-icon" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@400,600,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="stock.css" />
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">
+        <p>M</p>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="stock.html">Stock Status</a>
+        <a href="about.html">About</a>
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          aria-label="Toggle dark mode"
+        >
+          <i class="fas fa-moon"></i>
+        </button>
+      </nav>
+    </div>
+
+    <div class="chatbot" aria-label="Chat with our AI assistant">
+      <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="container bento-grid">
+      <div class="card controls-card">
+        <div class="card-header">
+          <h2 class="card-title">Stock Status Overview</h2>
+          <div class="card-description">
+            <p>Current inventory levels for all product lines</p>
+          </div>
+        </div>
+        <div class="controls-content" id="stock-overview">
+          <div class="loading-indicator">Loading stock data...</div>
+        </div>
+      </div>
+
+      <!-- Product Cards -->
+      <div class="card prediction-card" id="macbook-pro-stock">
+        <h2 class="card-title">MacBook Pro 💻</h2>
+        <p class="sales-info stock-number">Loading...</p>
+      </div>
+
+      <div class="card prediction-card" id="ipad-air-stock">
+        <h2 class="card-title">iPad Air 📱</h2>
+        <p class="sales-info stock-number">Loading...</p>
+      </div>
+
+      <div class="card prediction-card" id="iphone-15-pro-stock">
+        <h2 class="card-title">iPhone 15 Pro 📱</h2>
+        <p class="sales-info stock-number">Loading...</p>
+      </div>
+
+      <div class="card prediction-card" id="airpods-pro-stock">
+        <h2 class="card-title">AirPods Pro 🎧</h2>
+        <p class="sales-info stock-number">Loading...</p>
+      </div>
+
+      <div class="card prediction-card" id="apple-watch-ultra-stock">
+        <h2 class="card-title">Apple Watch Ultra ⌚</h2>
+        <p class="sales-info stock-number">Loading...</p>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <h2>M</h2>
+          <p>Mithilesha Analytics</p>
+        </div>
+        <p class="copyright">
+          © 2025 Mithilesha Analytics. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Get the current page filename
+      const currentPage = window.location.pathname.split("/").pop();
+
+      // Get all navigation links
+      const navLinks = document.querySelectorAll(".nav-links a");
+
+      // Add active class based on current page
+      navLinks.forEach((link) => {
+        const linkHref = link.getAttribute("href");
+
+        // Check if the link points to the current page or if it's the stock page
+        if (
+          linkHref === currentPage ||
+          (linkHref === "stock.html" && currentPage === "stock.html") ||
+          (linkHref === "stock-status.html" && currentPage === "stock.html") ||
+          (linkHref === "index.html" &&
+            (currentPage === "" || currentPage === "index.html")) ||
+          (linkHref === "dashboard.html" && currentPage === "dashboard.html")
+        ) {
+          link.classList.add("active-link");
+        }
+      });
+      
+      const CSV_FILE_PATH = "./data/apple_sales_2024.csv";
+
+      // DOM Elements
+      const stockOverview = document.getElementById("stock-overview");
+      const productCards = {
+        MacBook_Pro: document
+          .getElementById("macbook-pro-stock")
+          .querySelector(".stock-number"),
+        iPad_Air: document
+          .getElementById("ipad-air-stock")
+          .querySelector(".stock-number"),
+        iPhone_15_Pro: document
+          .getElementById("iphone-15-pro-stock")
+          .querySelector(".stock-number"),
+        AirPods_Pro: document
+          .getElementById("airpods-pro-stock")
+          .querySelector(".stock-number"),
+        Apple_Watch_Ultra: document
+          .getElementById("apple-watch-ultra-stock")
+          .querySelector(".stock-number"),
+      };
+
+      // Hardcoded fallback data
+      const fallbackData = {
+        MacBook_Pro: 160793,
+        iPad_Air: 472099,
+        iPhone_15_Pro: 627530,
+        AirPods_Pro: 254721,
+        Apple_Watch_Ultra: 191823,
+      };
+
+      // Fetch and parse CSV file
+      async function fetchStockData() {
+        try {
+          const response = await fetch(CSV_FILE_PATH);
+          if (!response.ok) throw new Error("CSV file not found.");
+
+          const csvText = await response.text();
+          const parsedData = parseCSV(csvText);
+          updateStockDisplay(parsedData);
+        } catch (error) {
+          console.error("Error fetching stock data:", error);
+          updateStockDisplay(fallbackData); // Use fallback values
+        }
+      }
+
+      // Parse CSV text to extract stock data
+      function parseCSV(csvText) {
+        const rows = csvText.trim().split("\n");
+        const header = rows[0].split(",");
+        const totals = {};
+
+        rows.slice(1).forEach((row) => {
+          const values = row.split(",");
+          header.forEach((column, index) => {
+            if (column.includes("Stock")) {
+              const product = column.replace("_Stock", "");
+              totals[product] =
+                (totals[product] || 0) + parseInt(values[index]);
+            }
+          });
+        });
+
+        return totals;
+      }
+
+      // Update Stock Display
+      function updateStockDisplay(data) {
+        stockOverview.innerHTML = Object.entries(data)
+          .map(
+            ([product, stock]) => `
+        <div class="stock-item">
+          <span class="stock-product">${product.replace(/_/g, " ")}</span>
+          <span class="stock-value">${stock.toLocaleString()} units</span>
+        </div>
+      `
+          )
+          .join("");
+
+        Object.entries(productCards).forEach(([product, element]) => {
+          const stock = data[product];
+          const statusClass =
+            stock < 400 ? "low-stock" : stock > 600 ? "high-stock" : "";
+          element.innerHTML = `
+          ${stock.toLocaleString()} Units
+          <div class="stock-status ${statusClass}">
+            ${
+              stock < 400
+                ? "↓ Low Stock"
+                : stock > 600
+                ? "↑ High Stock"
+                : "Normal"
+            }
+          </div>
+        `;
+        });
+      }
+
+      // Theme and Navigation Handlers
+      const themeToggle = document.getElementById("theme-toggle");
+      const themeIcon = themeToggle.querySelector("i");
+
+      if (localStorage.getItem("dark-mode") === "true") {
+        document.body.classList.add("dark-mode");
+        themeIcon.classList.replace("fa-moon", "fa-sun");
+      }
+
+      themeToggle.addEventListener("click", function () {
+        document.body.classList.toggle("dark-mode");
+        const isDarkMode = document.body.classList.contains("dark-mode");
+        themeIcon.classList.replace(
+          isDarkMode ? "fa-moon" : "fa-sun",
+          isDarkMode ? "fa-sun" : "fa-moon"
+        );
+        localStorage.setItem("dark-mode", isDarkMode);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchStockData();
+      });
+    </script>
+  </body>
+</html>
