@@ -28,6 +28,7 @@
       <nav class="nav-links">
         <a href="index.html">Home</a>
         <a href="dashboard.html">Dashboard</a>
+        <a href="stock.html">Stock Status</a>
         <a href="about.html">About</a>
         <button
           id="theme-toggle"
@@ -43,11 +44,7 @@
       <div class="chat-messages" id="chatMessages">
         <!-- Initial Bot message -->
         <div class="message bot-message">
-          <img
-            src="./assets/M.png"
-            alt=""
-            class="profile-image"
-          />
+          <img src="./assets/M.png" alt="" class="profile-image" />
           <div>
             Hey, you can ask for more insights below. For example: <br />
             1. What is the most sold product?<br />
@@ -211,8 +208,7 @@
           botMessageDiv.classList.add("message", "bot-message");
 
           const profileImg = document.createElement("img");
-          profileImg.src =
-            "./assets/M.png";
+          profileImg.src = "./assets/M.png";
           profileImg.alt = "bot profile";
           profileImg.classList.add("profile-image");
 
@@ -232,8 +228,7 @@
           errorMessageDiv.classList.add("message", "bot-message");
 
           const profileImg = document.createElement("img");
-          profileImg.src =
-            "./assets/M.png";
+          profileImg.src = "./assets/M.png";
           profileImg.alt = "bot profile";
           profileImg.classList.add("profile-image");
 
@@ -251,6 +246,41 @@
           loading.style.display = "none";
         }
       }
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'91e953262f463f60',t:'MTc0MTY3Nzk5OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
     </script>
   </body>
 </html>
