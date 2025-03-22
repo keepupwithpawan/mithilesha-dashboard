@@ -46,14 +46,12 @@
         <div class="message bot-message">
           <img src="./assets/M.png" alt="" class="profile-image" />
           <div>
-            Hey, you can ask for more insights below. For example: <br />
-            1. What is the most sold product?<br />
-            2. Which products are included in the dataset?
+
           </div>
         </div>
       </div>
       <div class="loading" id="loading" style="display: none">
-        Vetra is thinking
+        Mithilesha is thinking
       </div>
 
       <div class="input-container">
@@ -74,54 +72,41 @@
       </div>
     </footer>
 
+    <script src="/server.js"></script>
+
     <script>
       const chatMessages = document.getElementById("chatMessages");
       const userInput = document.getElementById("userInput");
       const loading = document.getElementById("loading");
 
+      // Event listener for Enter key
       userInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") sendMessage();
       });
 
-      // Get the current page filename
+      // Get the current page filename and navigation logic (unchanged)
       const currentPage = window.location.pathname.split("/").pop();
-
-      // Get all navigation links
       const navLinks = document.querySelectorAll(".nav-links a");
-
-      // Add active class based on current page
       navLinks.forEach((link) => {
         const linkHref = link.getAttribute("href");
-
-        // Check if the link points to the current page or if it's home and we're on index
         if (
           linkHref === currentPage ||
-          (linkHref === "#" &&
-            link.textContent === "Home" &&
-            (currentPage === "" || currentPage === "index.html")) ||
-          (linkHref === "#" &&
-            link.textContent === "Dashboard" &&
-            currentPage === "dashboard.html")
+          (linkHref === "chatbot.html" &&
+            (currentPage === "" || currentPage === "chatbot.html"))
         ) {
           link.classList.add("active-link");
         }
       });
 
-      // Dark mode toggle functionality
+      // Dark mode toggle (unchanged)
       const themeToggle = document.getElementById("theme-toggle");
       const themeIcon = themeToggle.querySelector("i");
-
-      // Check for saved theme preference
       if (localStorage.getItem("dark-mode") === "true") {
         document.body.classList.add("dark-mode");
         themeIcon.classList.replace("fa-moon", "fa-sun");
       }
-
-      // Toggle dark mode
       themeToggle.addEventListener("click", function () {
         document.body.classList.toggle("dark-mode");
-
-        // Toggle icon between moon and sun
         if (document.body.classList.contains("dark-mode")) {
           themeIcon.classList.replace("fa-moon", "fa-sun");
           localStorage.setItem("dark-mode", "true");
@@ -131,156 +116,111 @@
         }
       });
 
-      // Add active class based on current page
-      navLinks.forEach((link) => {
-        const linkHref = link.getAttribute("href");
-
-        if (
-          linkHref === currentPage ||
-          (linkHref === "chatbot.html" && currentPage === "") ||
-          (linkHref === "chatbot.html" && currentPage === "chatbot.html")
-        ) {
-          link.classList.add("active-link");
-        }
-      });
+      // Initial Bot message (unchanged)
+      const initialMessage = `
+    Hello! I'm your Mithilesha Analytics assistant powered by Google Gemini. I can help with:
+    - Stock levels and trends
+    - Dataset explanations
+    - Dashboard graph interpretations
+    Try asking: "What's the current stock status?" or "What does the 3M graph show?"
+  `;
+      appendBotMessage(initialMessage);
 
       async function sendMessage() {
         const message = userInput.value.trim();
         if (!message) return;
 
-        // Create user message element
+        appendUserMessage(message);
+        userInput.value = "";
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        loading.style.display = "block";
+
+        try {
+          const response = await fetch("http://localhost:5000/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message }),
+          });
+
+          if (!response.ok)
+            throw new Error(`HTTP error! Status: ${response.status}`);
+
+          const data = await response.json();
+          if (data.error) throw new Error(data.error);
+
+          appendBotMessage(data.message);
+        } catch (error) {
+          console.error("Error:", error);
+          appendBotMessage("Sorry, I encountered an error. Please try again.");
+        } finally {
+          loading.style.display = "none";
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+      }
+
+      function appendUserMessage(message) {
         const userMessageDiv = document.createElement("div");
         userMessageDiv.classList.add("message", "user-message");
         userMessageDiv.textContent = message;
         chatMessages.appendChild(userMessageDiv);
-
-        userInput.value = "";
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        // Show the loading indicator
-        loading.style.display = "block";
-
-        try {
-          const response = await fetch(
-            "https://mithilesha-langflow-render.onrender.com",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                input_value: message,
-                input_type: "chat",
-                output_type: "chat",
-                context: {
-                  dataset: [
-                    {
-                      post_type: "carousel",
-                      likes: 120,
-                      shares: 30,
-                      comments: 15,
-                      impressions: 1000,
-                      reach: 800,
-                    },
-                    {
-                      post_type: "reel",
-                      likes: 200,
-                      shares: 40,
-                      comments: 25,
-                      impressions: 1500,
-                      reach: 1200,
-                    },
-                  ],
-                },
-              }),
-            }
-          );
-
-          const data = await response.json();
-          console.log("API Response:", data);
-
-          const botResponse =
-            data.outputs?.[0]?.outputs?.[0]?.artifacts?.message ??
-            "Sorry, I couldn't process that response.";
-
-          // Create bot message with profile image
-          const botMessageDiv = document.createElement("div");
-          botMessageDiv.classList.add("message", "bot-message");
-
-          const profileImg = document.createElement("img");
-          profileImg.src = "./assets/M.png";
-          profileImg.alt = "bot profile";
-          profileImg.classList.add("profile-image");
-
-          const messageTextDiv = document.createElement("div");
-          messageTextDiv.textContent = botResponse;
-
-          botMessageDiv.appendChild(profileImg);
-          botMessageDiv.appendChild(messageTextDiv);
-
-          chatMessages.appendChild(botMessageDiv);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        } catch (error) {
-          console.error("Error:", error);
-
-          // Create error message
-          const errorMessageDiv = document.createElement("div");
-          errorMessageDiv.classList.add("message", "bot-message");
-
-          const profileImg = document.createElement("img");
-          profileImg.src = "./assets/M.png";
-          profileImg.alt = "bot profile";
-          profileImg.classList.add("profile-image");
-
-          const messageTextDiv = document.createElement("div");
-          messageTextDiv.textContent =
-            "Sorry, I encountered an error. Please try again.";
-
-          errorMessageDiv.appendChild(profileImg);
-          errorMessageDiv.appendChild(messageTextDiv);
-
-          chatMessages.appendChild(errorMessageDiv);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        } finally {
-          // Hide the loading indicator
-          loading.style.display = "none";
-        }
       }
-    </script>
-    <script>
-      (function () {
-        function c() {
-          var b = a.contentDocument || a.contentWindow.document;
-          if (b) {
-            var d = b.createElement("script");
-            d.innerHTML =
-              "window.__CF$cv$params={r:'91e953262f463f60',t:'MTc0MTY3Nzk5OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
-            b.getElementsByTagName("head")[0].appendChild(d);
+
+      function appendBotMessage(message) {
+        const botMessageDiv = document.createElement("div");
+        botMessageDiv.classList.add("message", "bot-message");
+
+        const profileImg = document.createElement("img");
+        profileImg.src = "./assets/M.png";
+        profileImg.alt = "bot profile";
+        profileImg.classList.add("profile-image");
+
+        const messageTextDiv = document.createElement("div");
+        messageTextDiv.classList.add("message-text");
+        messageTextDiv.innerHTML = beautifyResponse(message); // Beautify the response
+
+        botMessageDiv.appendChild(profileImg);
+        botMessageDiv.appendChild(messageTextDiv);
+        chatMessages.appendChild(botMessageDiv);
+      }
+
+      function beautifyResponse(text) {
+        // Split the text into paragraphs based on double newlines or significant breaks
+        const paragraphs = text.split(/\n\n|\n(?=\w)/).filter((p) => p.trim());
+
+        let htmlContent = "";
+
+        paragraphs.forEach((paragraph) => {
+          // Detect if the paragraph contains a list-like structure (e.g., "* **Product:**")
+          if (paragraph.includes("* **")) {
+            const listItems = paragraph
+              .split("\n")
+              .filter((line) => line.trim().startsWith("*"));
+            if (listItems.length > 0) {
+              htmlContent += '<ul class="product-list">';
+              listItems.forEach((item) => {
+                const [title, ...description] = item
+                  .replace("* **", "")
+                  .split(":");
+                htmlContent += `
+              <li>
+                <h3>${title.trim()}</h3>
+                <p>${description.join(":").trim()}</p>
+              </li>
+            `;
+              });
+              htmlContent += "</ul>";
+            } else {
+              htmlContent += `<p>${paragraph.trim()}</p>`;
+            }
+          } else {
+            // Treat as a regular paragraph
+            htmlContent += `<p>${paragraph.trim()}</p>`;
           }
-        }
-        if (document.body) {
-          var a = document.createElement("iframe");
-          a.height = 1;
-          a.width = 1;
-          a.style.position = "absolute";
-          a.style.top = 0;
-          a.style.left = 0;
-          a.style.border = "none";
-          a.style.visibility = "hidden";
-          document.body.appendChild(a);
-          if ("loading" !== document.readyState) c();
-          else if (window.addEventListener)
-            document.addEventListener("DOMContentLoaded", c);
-          else {
-            var e = document.onreadystatechange || function () {};
-            document.onreadystatechange = function (b) {
-              e(b);
-              "loading" !== document.readyState &&
-                ((document.onreadystatechange = e), c());
-            };
-          }
-        }
-      })();
+        });
+
+        return htmlContent;
+      }
     </script>
   </body>
 </html>
