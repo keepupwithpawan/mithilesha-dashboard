@@ -37,14 +37,15 @@
 
 .team-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
+    padding: 1rem;
 }
 
 /* Team card styles */
 .team-card {
     width: 100%;
-    height: 380px;
+    height: 400px;
     perspective: 1000px;
 }
 
@@ -56,6 +57,7 @@
     transform-style: preserve-3d;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background-color: var(--card-background);
 }
 
 .team-card:hover .card-inner {
@@ -70,15 +72,20 @@
     border-radius: 12px;
     overflow: hidden;
     padding: 1.5rem;
-    background-color: var(--card-background);
-    color: var(--text-primary);
     display: flex;
     flex-direction: column;
+}
+
+.card-front {
+    background-color: var(--card-background);
+    color: var(--text-primary);
 }
 
 .card-back {
     transform: rotateY(180deg);
     justify-content: center;
+    background-color: var(--card-background);
+    color: var(--text-primary);
 }
 
 .card-back h3 {
@@ -96,22 +103,29 @@
 
 .member-image {
     width: 100%;
-    height: 220px;
+    height: 240px;
     overflow: hidden;
     border-radius: 8px;
     margin-bottom: 1rem;
+    background-color: var(--background-secondary);
 }
 
 .member-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.member-image:hover img {
+    transform: scale(1.05);
 }
 
 .member-name {
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
+    color: var(--text-primary);
 }
 
 .member-title {
@@ -126,19 +140,21 @@
     right: 1.5rem;
     background-color: #0077b5;
     color: white;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    transition: transform 0.3s, background-color 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 119, 181, 0.3);
 }
 
 .linkedin-link:hover {
     transform: translateY(-3px);
     background-color: #005e93;
+    box-shadow: 0 4px 12px rgba(0, 119, 181, 0.4);
 }
 
 .linkedin-link i {
@@ -155,7 +171,7 @@
 @media (max-width: 768px) {
     .team-grid {
         grid-template-columns: 1fr;
-        gap: 3rem;
+        gap: 2rem;
     }
     
     .section-title {
@@ -164,5 +180,27 @@
     
     .team-card {
         height: 420px;
+    }
+
+    .member-image {
+        height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 1rem;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+    }
+
+    .team-card {
+        height: 400px;
+    }
+
+    .member-image {
+        height: 180px;
     }
 }
