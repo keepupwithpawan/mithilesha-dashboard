@@ -6,9 +6,7 @@ const cors = require("cors");
 const app = express();
 
 app.use(express.static(path.join(__dirname, "public")));
-
-// Enable CORS for all requests
-app.use(cors({ origin: "*" }));
+app.use(cors());
 
 // Load JSON data
 const RESULTS_PATH = path.join(__dirname, "public", "data", "all_results.json");
@@ -35,7 +33,7 @@ app.get("/api/product/:productId", (req, res) => {
     res.json(data[productId]);
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`✅ Server running at http://localhost:${PORT}`);
 });
