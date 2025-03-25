@@ -158,10 +158,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Hardcoded cutoff dates based on your data (Oct 21 - Dec 31, 2024)
         const cutoffDates = {
-            "1M": new Date("2024-12-17"), // Last 15 days: Dec 17 - Dec 31 (~15 days)
-            "3M": new Date("2024-12-02"), // Last 30 days: Dec 2 - Dec 31 (~30 days)
-            "6M": new Date("2024-11-17"), // Last 45 days: Nov 17 - Dec 31 (~45 days)
-            "1Y": new Date("2024-11-02"), // Last 60 days: Nov 2 - Dec 31 (~60 days)
+            "15D": new Date("2024-12-17"), // Last 15 days: Dec 17 - Dec 31 (~15 days)
+            "30D": new Date("2024-12-02"), // Last 30 days: Dec 2 - Dec 31 (~30 days)
+            "45D": new Date("2024-11-17"), // Last 45 days: Nov 17 - Dec 31 (~45 days)
+            "60D": new Date("2024-11-02"), // Last 60 days: Nov 2 - Dec 31 (~60 days)
             "ALL": new Date("2024-10-20") // Full range: Oct 21 - Dec 31 (72 days)
         };
 
