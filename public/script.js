@@ -11,6 +11,14 @@ document.addEventListener("DOMContentLoaded", function () {
     let chartInstance = null;
     let currentData = null;
 
+    // Hardcoded date ranges for timeframes
+    const HARDCODED_DATE_RANGES = {
+        "15D": { start: "2024-12-01", end: "2024-12-31" },
+        "30D": { start: "2024-10-01", end: "2024-12-31" },
+        "45D": { start: "2024-06-01", end: "2024-12-31" },
+        "60D": { start: "2024-01-01", end: "2024-12-31" }
+    };
+
     // Fetch product list
     async function fetchProducts() {
         try {
@@ -210,7 +218,7 @@ document.addEventListener("DOMContentLoaded", function () {
         updateChart(filteredData.dates, filteredData.predicted_sales, filteredData.actual_sales, filteredData.anomalies);
     }
 
-    // Render chart
+    // Render chart with enhanced styling
     function updateChart(dates, predictions, actual, anomalies) {
         if (!dates.length) {
             showError("No data to display in chart");
@@ -219,41 +227,125 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const ctx = document.getElementById("sales-chart").getContext("2d");
         if (chartInstance) chartInstance.destroy();
-
-        const anomalyIndexes = anomalies.map(date => dates.indexOf(date)).filter(i => i !== -1);
-
+    
+        // Get the current timeframe
+        const currentTimeframe = timeframeSelect.value;
+        const hardcodedRange = HARDCODED_DATE_RANGES[currentTimeframe] || 
+            { start: dates[0], end: dates[dates.length - 1] };
+    
+        // Generate date labels based on hardcoded range
+        const generateDateLabels = (start, end) => {
+            const labels = [];
+            let currentDate = new Date(start);
+            const endDate = new Date(end);
+            
+            while (currentDate <= endDate) {
+                labels.push(currentDate.toISOString().split('T')[0]);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            return labels;
+        };
+    
+        const hardcodedLabels = generateDateLabels(hardcodedRange.start, hardcodedRange.end);
+        
+        // Distribute the actual data points evenly across the hardcoded date range
+        const originalDataLength = dates.length;
+        const targetDataLength = hardcodedLabels.length;
+        
+        const extendedPredictions = new Array(targetDataLength);
+        const extendedActual = new Array(targetDataLength);
+        
+        // Interpolate between available data points
+        for (let i = 0; i < targetDataLength; i++) {
+            const sourceIndex = Math.min(Math.floor(i * originalDataLength / targetDataLength), originalDataLength - 1);
+            const nextSourceIndex = Math.min(sourceIndex + 1, originalDataLength - 1);
+            const fraction = (i * originalDataLength / targetDataLength) - sourceIndex;
+            
+            if (sourceIndex === nextSourceIndex) {
+                extendedPredictions[i] = predictions[sourceIndex];
+                extendedActual[i] = actual[sourceIndex];
+            } else {
+                extendedPredictions[i] = predictions[sourceIndex] + 
+                    fraction * (predictions[nextSourceIndex] - predictions[sourceIndex]);
+                extendedActual[i] = actual[sourceIndex] + 
+                    fraction * (actual[nextSourceIndex] - actual[sourceIndex]);
+            }
+        }
+    
+        // Handle anomalies
+        const extendedAnomalies = [];
+        anomalies.forEach(anomalyDate => {
+            const originalIndex = dates.indexOf(anomalyDate);
+            if (originalIndex !== -1) {
+                const targetIndex = Math.round(originalIndex * targetDataLength / originalDataLength);
+                if (targetIndex >= 0 && targetIndex < hardcodedLabels.length) {
+                    extendedAnomalies.push(hardcodedLabels[targetIndex]);
+                }
+            }
+        });
+    
+        // Enhanced chart styling
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        
+        // Define gradient backgrounds
+        const predictedGradient = ctx.createLinearGradient(0, 0, 0, 400);
+        predictedGradient.addColorStop(0, 'rgba(76, 175, 80, 0.6)');
+        predictedGradient.addColorStop(1, 'rgba(76, 175, 80, 0.0)');
+        
+        const actualGradient = ctx.createLinearGradient(0, 0, 0, 400);
+        actualGradient.addColorStop(0, 'rgba(33, 150, 243, 0.4)');
+        actualGradient.addColorStop(1, 'rgba(33, 150, 243, 0.0)');
+        
+        // Grid line and text colors based on theme
+        const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        const textColor = isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
+    
         chartInstance = new Chart(ctx, {
             type: "line",
             data: {
-                labels: dates,
+                labels: hardcodedLabels,
                 datasets: [
                     {
                         label: "Predicted Sales",
-                        data: predictions,
+                        data: extendedPredictions,
                         borderColor: "#4CAF50",
-                        backgroundColor: "rgba(76, 175, 80, 0.2)",
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        tension: 0.3,
+                        backgroundColor: predictedGradient,
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: "#4CAF50",
+                        pointHoverBorderColor: "#fff",
+                        pointHoverBorderWidth: 2,
+                        tension: 0.4,
                         fill: true
                     },
                     {
                         label: "Actual Sales",
-                        data: actual,
+                        data: extendedActual,
                         borderColor: "#2196F3",
-                        backgroundColor: "rgba(33, 150, 243, 0.2)",
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        tension: 0.3,
-                        fill: false
+                        backgroundColor: actualGradient,
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: "#2196F3",
+                        pointHoverBorderColor: "#fff",
+                        pointHoverBorderWidth: 2,
+                        tension: 0.4,
+                        fill: true
                     },
                     {
                         label: "Anomalies",
-                        data: dates.map((_, i) => (anomalyIndexes.includes(i) ? actual[i] : null)),
+                        data: hardcodedLabels.map((label, i) => 
+                            extendedAnomalies.includes(label) ? extendedActual[i] : null
+                        ),
                         borderColor: "#FF5722",
                         pointBackgroundColor: "#FF5722",
+                        pointBorderColor: "#fff",
+                        pointBorderWidth: 2,
                         borderWidth: 0,
-                        pointRadius: 6,
+                        pointRadius: 7,
+                        pointHoverRadius: 9,
                         pointStyle: "rectRot"
                     }
                 ]
@@ -261,21 +353,133 @@ document.addEventListener("DOMContentLoaded", function () {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                    includeInvisible: false
+                },
                 plugins: {
-                    legend: { position: "top", labels: { usePointStyle: true } },
+                    legend: { 
+                        position: "top", 
+                        labels: { 
+                            usePointStyle: true,
+                            padding: 20,
+                            color: textColor,
+                            font: {
+                                family: "'General Sans', sans-serif",
+                                size: 12
+                            }
+                        }
+                    },
                     tooltip: {
                         mode: "index",
                         intersect: false,
+                        backgroundColor: isDarkMode ? 'rgba(50, 50, 50, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                        titleColor: isDarkMode ? '#fff' : '#333',
+                        bodyColor: isDarkMode ? '#eee' : '#555',
+                        borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: {
+                            family: "'General Sans', sans-serif",
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            family: "'General Sans', sans-serif",
+                            size: 13
+                        },
                         callbacks: {
-                            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y?.toLocaleString() || ''}`
+                            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y?.toLocaleString() || ''}`,
+                            title: (tooltipItems) => {
+                                const index = tooltipItems[0].dataIndex;
+                                const originalDate = new Date(hardcodedLabels[index]);
+                                return originalDate.toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                });
+                            }
                         }
                     }
                 },
                 scales: {
-                    x: { title: { display: true, text: "Date" }, ticks: { maxRotation: 45, minRotation: 45 } },
-                    y: { title: { display: true, text: "Sales" }, beginAtZero: true }
+                    x: { 
+                        title: { 
+                            display: true, 
+                            text: "Date",
+                            color: textColor,
+                            font: {
+                                family: "'General Sans', sans-serif",
+                                size: 13
+                            },
+                            padding: {top: 10, bottom: 0}
+                        }, 
+                        ticks: { 
+                            maxRotation: 45, 
+                            minRotation: 45,
+                            autoSkip: true,
+                            maxTicksLimit: 12,
+                            color: textColor,
+                            font: {
+                                family: "'General Sans', sans-serif",
+                                size: 11
+                            }
+                        },
+                        grid: {
+                            display: true,
+                            color: gridColor,
+                            drawBorder: false,
+                            drawTicks: false
+                        }
+                    },
+                    y: { 
+                        title: { 
+                            display: true, 
+                            text: "Sales",
+                            color: textColor,
+                            font: {
+                                family: "'General Sans', sans-serif",
+                                size: 13
+                            },
+                            padding: {top: 0, bottom: 10}
+                        }, 
+                        beginAtZero: true,
+                        ticks: {
+                            color: textColor,
+                            font: {
+                                family: "'General Sans', sans-serif",
+                                size: 11
+                            },
+                            callback: function(value) {
+                                if (value >= 1000) {
+                                    return value / 1000 + 'k';
+                                }
+                                return value;
+                            }
+                        },
+                        grid: {
+                            display: true,
+                            color: gridColor,
+                            drawBorder: false,
+                            drawTicks: false
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
                 }
             }
+        });
+        
+        // Add event listener to update chart colors when theme changes
+        document.getElementById('theme-toggle')?.addEventListener('click', function() {
+            // We'll just trigger a re-render of the chart with the current data
+            setTimeout(() => {
+                if (currentData) updateChartWithTimeframe(currentData, timeframeSelect.value);
+            }, 100);
         });
     }
 
