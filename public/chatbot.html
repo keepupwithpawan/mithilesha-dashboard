@@ -42,16 +42,22 @@
 
     <div class="chat-container">
       <div class="chat-messages" id="chatMessages">
-        <!-- Initial Bot message -->
         <div class="message bot-message">
           <img src="./assets/M.png" alt="" class="profile-image" />
-          <div>
-
+          <div class="message-text">
+            Hello! I'm your Mithilesha Analytics AI assistant. 
+            I can help you with:
+            - Stock levels and trends
+            - Sales data analysis
+            - Dashboard insights
+            
+            Ask me anything about our Apple product data!
           </div>
         </div>
       </div>
+      
       <div class="loading" id="loading" style="display: none">
-        Mithilesha is thinking
+        Mithilesha is thinking...
       </div>
 
       <div class="input-container">
@@ -72,9 +78,8 @@
       </div>
     </footer>
 
-    <script src="/server.js"></script>
-
     <script>
+      const API_BASE_URL = window.location.origin;  // Dynamic API URL
       const chatMessages = document.getElementById("chatMessages");
       const userInput = document.getElementById("userInput");
       const loading = document.getElementById("loading");
@@ -84,7 +89,7 @@
         if (e.key === "Enter") sendMessage();
       });
 
-      // Get the current page filename and navigation logic (unchanged)
+      // Navigation highlight
       const currentPage = window.location.pathname.split("/").pop();
       const navLinks = document.querySelectorAll(".nav-links a");
       navLinks.forEach((link) => {
@@ -98,13 +103,15 @@
         }
       });
 
-      // Dark mode toggle (unchanged)
+      // Dark mode toggle
       const themeToggle = document.getElementById("theme-toggle");
       const themeIcon = themeToggle.querySelector("i");
+      
       if (localStorage.getItem("dark-mode") === "true") {
         document.body.classList.add("dark-mode");
         themeIcon.classList.replace("fa-moon", "fa-sun");
       }
+      
       themeToggle.addEventListener("click", function () {
         document.body.classList.toggle("dark-mode");
         if (document.body.classList.contains("dark-mode")) {
@@ -115,16 +122,6 @@
           localStorage.setItem("dark-mode", "false");
         }
       });
-
-      // Initial Bot message (unchanged)
-      const initialMessage = `
-    Hello! I'm your Mithilesha Analytics assistant powered by Google Gemini. I can help with:
-    - Stock levels and trends
-    - Dataset explanations
-    - Dashboard graph interpretations
-    Try asking: "What's the current stock status?" or "What does the 3M graph show?"
-  `;
-      appendBotMessage(initialMessage);
 
       async function sendMessage() {
         const message = userInput.value.trim();
@@ -137,21 +134,27 @@
         loading.style.display = "block";
 
         try {
-          const response = await fetch("http://localhost:5000/api/chat", {
+          const response = await fetch(`${API_BASE_URL}/api/chat`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message }),
+            headers: { 
+              "Content-Type": "application/json" 
+            },
+            body: JSON.stringify({ message })
           });
 
-          if (!response.ok)
+          if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
+          }
 
           const data = await response.json();
-          if (data.error) throw new Error(data.error);
+          
+          if (data.error) {
+            throw new Error(data.error);
+          }
 
           appendBotMessage(data.message);
         } catch (error) {
-          console.error("Error:", error);
+          console.error("Chat Error:", error);
           appendBotMessage("Sorry, I encountered an error. Please try again.");
         } finally {
           loading.style.display = "none";
@@ -177,7 +180,7 @@
 
         const messageTextDiv = document.createElement("div");
         messageTextDiv.classList.add("message-text");
-        messageTextDiv.innerHTML = beautifyResponse(message); // Beautify the response
+        messageTextDiv.innerHTML = beautifyResponse(message);
 
         botMessageDiv.appendChild(profileImg);
         botMessageDiv.appendChild(messageTextDiv);
@@ -185,36 +188,35 @@
       }
 
       function beautifyResponse(text) {
-        // Split the text into paragraphs based on double newlines or significant breaks
         const paragraphs = text.split(/\n\n|\n(?=\w)/).filter((p) => p.trim());
 
         let htmlContent = "";
 
         paragraphs.forEach((paragraph) => {
-          // Detect if the paragraph contains a list-like structure (e.g., "* **Product:**")
           if (paragraph.includes("* **")) {
             const listItems = paragraph
               .split("\n")
               .filter((line) => line.trim().startsWith("*"));
+            
             if (listItems.length > 0) {
               htmlContent += '<ul class="product-list">';
               listItems.forEach((item) => {
                 const [title, ...description] = item
                   .replace("* **", "")
                   .split(":");
+                
                 htmlContent += `
-              <li>
-                <h3>${title.trim()}</h3>
-                <p>${description.join(":").trim()}</p>
-              </li>
-            `;
+                  <li>
+                    <h3>${title.trim()}</h3>
+                    <p>${description.join(":").trim()}</p>
+                  </li>
+                `;
               });
               htmlContent += "</ul>";
             } else {
               htmlContent += `<p>${paragraph.trim()}</p>`;
             }
           } else {
-            // Treat as a regular paragraph
             htmlContent += `<p>${paragraph.trim()}</p>`;
           }
         });
