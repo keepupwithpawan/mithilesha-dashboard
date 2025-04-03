@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // API Base URL
-    const API_BASE_URL = "https://mithilesha-dashboard.vercel.app/dashboard.html";
+    const API_BASE_URL = "https://mithilesha-render.onrender.com";
 
     // DOM elements
     const productSelect = document.getElementById("product-select");
