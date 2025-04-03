@@ -15,7 +15,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Dynamic CORS configuration
 const ALLOWED_ORIGINS = [
-    'https://your-frontend-domain.com',  // Replace with your actual frontend domain
+    'https://mithilesha-render.onrender.com',  // Replace with your actual frontend domain
     'http://localhost:3000',  // Local development
     'http://localhost:5000'   // Server port
 ];
