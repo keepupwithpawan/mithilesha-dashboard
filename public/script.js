@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // API Base URL
-    const API_BASE_URL = "https://mithilesha-render.onrender.com/api";
+    // API Base URL with environment detection
+    const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? `http://${window.location.hostname}:5000/api`
+        : "https://mithilesha-render.onrender.com/api";
+
+    console.log("Using API Base URL:", API_BASE_URL);
 
     // DOM elements
     const productSelect = document.getElementById("product-select");
@@ -19,73 +23,118 @@ document.addEventListener("DOMContentLoaded", function () {
         "60D": { start: "2024-01-01", end: "2024-12-31" }
     };
 
-    // Fetch product list
-    // Update your fetchProducts function to handle CORS errors
-    async function fetchProducts() {
-      try {
-        const response = await fetch('https://mithilesha-render.onrender.com/', {
-          method: 'GET',
-          credentials: 'include', // Include credentials if you're using cookies
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+    // Helper function to check if the API is available
+    async function checkAPIHealth() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/health`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                console.log("API health check successful");
+                return true;
+            } else {
+                console.error("API health check failed with status:", response.status);
+                return false;
+            }
+        } catch (error) {
+            console.error("API health check failed:", error);
+            return false;
         }
-        
-        return await response.json();
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        
-        // Fallback to local data or display a user-friendly error
-        document.getElementById('product-select').innerHTML = `
-          <option value="all">All Products</option>
-          <option value="electronics">Electronics</option>
-          <option value="clothing">Clothing</option>
-        `;
-        
-        // Update other elements that depend on this data
-        updateUIWithErrorState();
-        
-        throw error;
-      }
     }
 
-    // Add a function to handle UI updates when API calls fail
-    function updateUIWithErrorState() {
-      // Update loading indicators with error messages
-      document.getElementById('sales-number').textContent = 'Data unavailable';
-      
-      const anomalyBox = document.getElementById('anomaly-box');
-      if (anomalyBox) {
-        anomalyBox.innerHTML = '<div class="error-message">Unable to load anomaly data. Please try again later.</div>';
-      }
-      
-      // If you have a chart, display a placeholder or error message
-      const salesChart = document.getElementById('sales-chart');
-      if (salesChart) {
-        // Create a simple placeholder chart or error message
-        const ctx = salesChart.getContext('2d');
-        ctx.font = '16px Arial';
-        ctx.fillStyle = '#666';
-        ctx.textAlign = 'center';
-        ctx.fillText('Chart data unavailable', salesChart.width/2, salesChart.height/2);
-      }
+    // Fetch product list
+    async function fetchProducts() {
+        try {
+            updateLoadingState(true);
+            
+            // Check API health first
+            const isAPIHealthy = await checkAPIHealth();
+            if (!isAPIHealthy) {
+                throw new Error("API server is not available. Please try again later.");
+            }
+            
+            console.log("Fetching products from:", `${API_BASE_URL}/products`);
+            const response = await fetch(`${API_BASE_URL}/products`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            });
+            
+            console.log("Response status:", response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
+            }
+
+            const data = await response.json();
+            console.log("Products data received:", data);
+            
+            productSelect.innerHTML = '';
+
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent = "Select a product";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            productSelect.appendChild(defaultOption);
+
+            data.products.forEach(product => {
+                const option = document.createElement("option");
+                option.value = product;
+                option.textContent = product.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+                productSelect.appendChild(option);
+            });
+
+            if (data.products.length > 0) {
+                productSelect.value = data.products[0];
+                fetchProductData(data.products[0]);
+            } else {
+                showError("No products available");
+            }
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            showError(`Failed to load products: ${error.message}`);
+        } finally {
+            updateLoadingState(false);
+        }
     }
+
     // Fetch product data
     async function fetchProductData(product) {
         try {
             updateLoadingState(true);
-            const response = await fetch(`${API_BASE_URL}/product/${product}`);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            console.log("Fetching product data for:", product);
+            
+            const response = await fetch(`${API_BASE_URL}/product/${product}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            });
+            
+            console.log("Product data response status:", response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
+            }
 
             currentData = await response.json();
+            console.log("Product data received:", currentData);
             updateDashboard(currentData);
         } catch (error) {
             console.error("Error fetching product data:", error);
-            showError("Failed to load product data.");
+            showError(`Failed to load product data: ${error.message}`);
         } finally {
             updateLoadingState(false);
         }
