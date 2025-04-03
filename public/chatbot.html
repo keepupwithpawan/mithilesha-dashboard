@@ -79,54 +79,10 @@
     </footer>
 
     <script>
-      // Configuration
-      const API_BASE_URL = "https://mithilesha-render.onrender.com"; // REPLACE with your actual backend URL
-      
-      // For local development testing
-      const USE_LOCAL_FALLBACK = true; // Set to false in production
-      const LOCAL_API_URL = "http://localhost:5000";
-      
+      const API_BASE_URL = window.location.origin;  // Dynamic API URL
       const chatMessages = document.getElementById("chatMessages");
       const userInput = document.getElementById("userInput");
       const loading = document.getElementById("loading");
-      
-      // Function to get the appropriate API URL
-      function getApiUrl() {
-        // Try the production URL first
-        return new Promise((resolve) => {
-          // Check if the production API is available
-          fetch(`${API_BASE_URL}/api/health`, { method: 'GET' })
-            .then(response => {
-              if (response.ok) {
-                resolve(API_BASE_URL);
-              } else {
-                throw new Error("Production API not available");
-              }
-            })
-            .catch(() => {
-              // If production API fails and local fallback is enabled
-              if (USE_LOCAL_FALLBACK) {
-                // Check if local API is available
-                fetch(`${LOCAL_API_URL}/api/health`, { method: 'GET' })
-                  .then(response => {
-                    if (response.ok) {
-                      console.log("Using local API fallback");
-                      resolve(LOCAL_API_URL);
-                    } else {
-                      throw new Error("Local API not available");
-                    }
-                  })
-                  .catch(() => {
-                    console.log("No API available, using mock responses");
-                    resolve(null); // No API available
-                  });
-              } else {
-                console.log("Production API not available and fallback disabled");
-                resolve(null); // No API available
-              }
-            });
-        });
-      }
 
       // Event listener for Enter key
       userInput.addEventListener("keypress", (e) => {
@@ -167,14 +123,6 @@
         }
       });
 
-      // Mock responses for fallback when API is unreachable
-      const mockResponses = [
-        "I'm sorry, but I'm currently operating in offline mode due to connectivity issues. Please try again later when the server connection is restored.",
-        "Based on our most recent data, iPhone 15 Pro has the highest sales volume among our products, with over 12,000 units sold in the last quarter.",
-        "The dashboard shows a positive trend for MacBook Pro sales, with a 15% increase predicted for the next month.",
-        "Our current stock levels are: MacBook Pro (530 units), iPad Air (420 units), iPhone 15 Pro (610 units), AirPods Pro (350 units), and Apple Watch Ultra (480 units)."
-      ];
-
       async function sendMessage() {
         const message = userInput.value.trim();
         if (!message) return;
@@ -186,41 +134,28 @@
         loading.style.display = "block";
 
         try {
-          // Get the appropriate API URL (production, local, or null if neither is available)
-          const apiUrl = await getApiUrl();
-          
-          if (apiUrl) {
-            // API is available, send real request
-            const response = await fetch(`${apiUrl}/api/chat`, {
-              method: "POST",
-              headers: { 
-                "Content-Type": "application/json" 
-              },
-              body: JSON.stringify({ message })
-            });
+          const response = await fetch(`${API_BASE_URL}/api/chat`, {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json" 
+            },
+            body: JSON.stringify({ message })
+          });
 
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            if (data.error) {
-              throw new Error(data.error);
-            }
-
-            appendBotMessage(data.message);
-          } else {
-            // No API available, use mock response
-            setTimeout(() => {
-              // Get a random mock response
-              const randomIndex = Math.floor(Math.random() * mockResponses.length);
-              appendBotMessage(mockResponses[randomIndex]);
-            }, 1000); // Simulate processing delay
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
           }
+
+          const data = await response.json();
+          
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          appendBotMessage(data.message);
         } catch (error) {
           console.error("Chat Error:", error);
-          appendBotMessage("Sorry, I encountered an error connecting to the server. Please check your connection and try again.");
+          appendBotMessage("Sorry, I encountered an error. Please try again.");
         } finally {
           loading.style.display = "none";
           chatMessages.scrollTop = chatMessages.scrollHeight;
