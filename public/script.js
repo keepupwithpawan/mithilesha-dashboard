@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // API Base URL
-    const API_BASE_URL = "https://mithilesha-render.onrender.com";
+    const API_BASE_URL = "https://mithilesha-render.onrender.com/api";
 
     // DOM elements
     const productSelect = document.getElementById("product-select");
@@ -20,43 +20,60 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // Fetch product list
+    // Update your fetchProducts function to handle CORS errors
     async function fetchProducts() {
-        try {
-            updateLoadingState(true);
-            const response = await fetch(`${API_BASE_URL}`);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-            const data = await response.json();
-            productSelect.innerHTML = '';
-
-            const defaultOption = document.createElement("option");
-            defaultOption.value = "";
-            defaultOption.textContent = "Select a product";
-            defaultOption.disabled = true;
-            defaultOption.selected = true;
-            productSelect.appendChild(defaultOption);
-
-            data.products.forEach(product => {
-                const option = document.createElement("option");
-                option.value = product;
-                option.textContent = product.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-                productSelect.appendChild(option);
-            });
-
-            if (data.products.length > 0) {
-                productSelect.value = data.products[0];
-                fetchProductData(data.products[0]);
-            } else {
-                showError("No products available");
-            }
-        } catch (error) {
-            console.error("Error fetching products:", error);
-            showError("Failed to load products.");
-        } finally {
-            updateLoadingState(false);
+      try {
+        const response = await fetch('https://mithilesha-render.onrender.com/', {
+          method: 'GET',
+          credentials: 'include', // Include credentials if you're using cookies
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        
+        return await response.json();
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        
+        // Fallback to local data or display a user-friendly error
+        document.getElementById('product-select').innerHTML = `
+          <option value="all">All Products</option>
+          <option value="electronics">Electronics</option>
+          <option value="clothing">Clothing</option>
+        `;
+        
+        // Update other elements that depend on this data
+        updateUIWithErrorState();
+        
+        throw error;
+      }
     }
 
+    // Add a function to handle UI updates when API calls fail
+    function updateUIWithErrorState() {
+      // Update loading indicators with error messages
+      document.getElementById('sales-number').textContent = 'Data unavailable';
+      
+      const anomalyBox = document.getElementById('anomaly-box');
+      if (anomalyBox) {
+        anomalyBox.innerHTML = '<div class="error-message">Unable to load anomaly data. Please try again later.</div>';
+      }
+      
+      // If you have a chart, display a placeholder or error message
+      const salesChart = document.getElementById('sales-chart');
+      if (salesChart) {
+        // Create a simple placeholder chart or error message
+        const ctx = salesChart.getContext('2d');
+        ctx.font = '16px Arial';
+        ctx.fillStyle = '#666';
+        ctx.textAlign = 'center';
+        ctx.fillText('Chart data unavailable', salesChart.width/2, salesChart.height/2);
+      }
+    }
     // Fetch product data
     async function fetchProductData(product) {
         try {
